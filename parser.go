@@ -34,7 +34,6 @@ func detect(reader *bufio.Reader) (*Format, error) {
 	scanner := bufio.NewScanner(reader)
 
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
 		line := scanner.Text()
 		if line == YamlFormat.Delimiter {
 			return YamlFormat, nil
