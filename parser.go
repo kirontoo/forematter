@@ -2,48 +2,51 @@ package forematter
 
 import (
 	"bufio"
-	"fmt"
-	"strings"
 	"errors"
+	"fmt"
+	"log"
+	"strings"
 )
 
-func Parse(input string) []byte {
+func Parse(input string) {
 	reader := bufio.NewReader(strings.NewReader(input))
 
-	line, err := reader.ReadBytes('\n')
-	if err != nil {
-		fmt.Print(err)
-	}
-	fmt.Print(string(line))
-
 	// Detect
-	_, err = detect(reader)
+	_, err := detect(reader)
 	if err != nil {
-		fmt.Print(err)
+		log.Fatal(err)
 	}
-
-	return line
 }
 
 func detect(reader *bufio.Reader) (*Format, error) {
-	line, err := reader.ReadBytes('\n')
+	firstLine, err := reader.ReadBytes('\n')
 	if err != nil {
 		fmt.Print(err)
 	}
 
 	// Check if YAML or TOML
-	if string(line) == YamlFormat.Delimiter {
-		return YamlFormat, nil
-	}
-
-	if string(line) == TomlFormat.Delimiter {
-		return TomlFormat, nil
+	if string(firstLine) != YamlFormat.Delimiter || string(firstLine) != TomlFormat.Delimiter {
+		return nil, errors.New("invalid format")
 	}
 
 	// check for closing delimiter
 	// if closing delimiter, then valid input
+	scanner := bufio.NewScanner(reader)
 
-	
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+		line := scanner.Text()
+		if line == YamlFormat.Delimiter {
+			return YamlFormat, nil
+		}
+		if line == TomlFormat.Delimiter {
+			return TomlFormat, nil
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
 	return nil, errors.New("invalid format")
 }
-

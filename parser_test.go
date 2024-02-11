@@ -1,29 +1,63 @@
 package forematter
 
 import (
-	"testing"
 	"bufio"
-	"strings"
 	"reflect"
+	"strings"
+	"testing"
 )
 
-func TestParser(t *testing.T) {
-	line := Parse(`----
-	hi: hello
-	----
-	`)
-	t.Log(line)
-}
-
 func TestDetect(t *testing.T) {
-	input := `----
-	hi: hello
-	----
-	`
-
-	t.Run("detect format yaml", func(t *testing.T) {
-		reader := bufio.NewReader(strings.NewReader(input))
+	t.Run("detects YAML format", func(t *testing.T) {
+		const yamlInput = `----
+		hi: hello
+		----
+		`
+		reader := bufio.NewReader(strings.NewReader(yamlInput))
 		got, _ := detect(reader)
 		reflect.DeepEqual(got, YamlFormat)
+	})
+
+	t.Run("detects TOML format", func(t *testing.T) {
+		const tomlInput = `++++
+		hi: hello
+		++++
+		`
+		reader := bufio.NewReader(strings.NewReader(tomlInput))
+		got, _ := detect(reader)
+		reflect.DeepEqual(got, TomlFormat)
+	})
+
+	t.Run("detects invalid delimiter", func(t *testing.T) {
+		const input = `;;;
+		hi: hello
+		;;;`
+
+		reader := bufio.NewReader(strings.NewReader(input))
+		got, err := detect(reader)
+
+		if got != nil {
+			t.Fail()
+		}
+		if err == nil {
+			t.Fail()
+		}
+	})
+
+	t.Run("detects invalid format", func(t *testing.T) {
+		const input = `++++
+		hi: hello
+		++++
+		`
+
+		reader := bufio.NewReader(strings.NewReader(input))
+		got, err := detect(reader)
+
+		if got != nil {
+			t.Fail()
+		}
+		if err == nil {
+			t.Fail()
+		}
 	})
 }
