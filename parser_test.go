@@ -9,23 +9,27 @@ import (
 
 func TestDetect(t *testing.T) {
 	t.Run("detects YAML format", func(t *testing.T) {
-		const yamlInput = `----
+		const yamlInput = `---
 		hi: hello
-		----
+		---
 		`
 		reader := bufio.NewReader(strings.NewReader(yamlInput))
 		got, _ := detect(reader)
-		reflect.DeepEqual(got, YamlFormat)
+		if eq := reflect.DeepEqual(got, YamlFormat); !eq {
+			t.Fail()
+		}
 	})
 
 	t.Run("detects TOML format", func(t *testing.T) {
-		const tomlInput = `++++
+		const tomlInput = `+++
 		hi: hello
-		++++
+		+++
 		`
 		reader := bufio.NewReader(strings.NewReader(tomlInput))
 		got, _ := detect(reader)
-		reflect.DeepEqual(got, TomlFormat)
+		if eq := reflect.DeepEqual(got, TomlFormat); !eq {
+			t.Fail()
+		}
 	})
 
 	t.Run("detects invalid delimiter", func(t *testing.T) {
@@ -45,6 +49,7 @@ func TestDetect(t *testing.T) {
 	})
 
 	t.Run("detects invalid format", func(t *testing.T) {
+		// TODO: test passes when it shouldn't
 		const input = `++++
 		hi: hello
 		++++
