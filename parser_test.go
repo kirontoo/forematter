@@ -66,3 +66,27 @@ func TestDetect(t *testing.T) {
 		}
 	})
 }
+
+func TestExtract(t *testing.T) {
+	const input = `---
+		title: my new title
+		pubDate: 01-24-2024
+		description: this is a simple description
+		---
+		`
+
+	type Frontmatter struct {
+		Title       string `yaml:"title"`
+		PubDate     string `yaml:"pubDate"`
+		Description string `yaml:"description"`
+	}
+
+	got := Frontmatter{}
+	expect := Frontmatter{Title: "my new title", PubDate: "01-24-2024", Description: "this is a simple description"}
+
+	reader := bufio.NewReader(strings.NewReader(input))
+	extract(reader, YamlFormat, &got)
+	if valid := reflect.DeepEqual(got, expect); !valid {
+		t.Fail()
+	}
+}
