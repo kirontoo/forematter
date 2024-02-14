@@ -5,15 +5,15 @@ import (
 	"github.com/pelletier/go-toml/v2"
 )
 
-type UnMarshalFunc func(data []byte, v interface{}) error
+type UnmarshalFunc func(data []byte, v interface{}) error
 
 type Format struct {
 	Delimiter string
-	UnMarshal UnMarshalFunc
+	Unmarshal UnmarshalFunc
 }
 
-func newFormat(delim string, unMarshalFunc UnMarshalFunc) *Format {
-	return &Format{ Delimiter: delim, UnMarshal: unMarshalFunc}
+func newFormat(delim string, unmarshalFunc UnmarshalFunc) *Format {
+	return &Format{ Delimiter: delim, Unmarshal: unmarshalFunc}
 }
 
 var YamlFormat = newFormat( "---", yaml.Unmarshal )
